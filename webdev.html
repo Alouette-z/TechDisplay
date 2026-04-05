@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Museum - Complete Hardware Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0f0f23 100%);
+            --glass-bg: rgba(255,255,255,0.08);
+            --glass-border: rgba(255,255,255,0.15);
+            --accent-cyan: #00f5ff;
+            --accent-magenta: #ff00ff;
+            --accent-gold: #ffd700;
+            --accent-green: #00ff88;
+            --accent-orange: #ff6600;
+            --accent-purple: #aa44ff;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.8);
+            --shadow-light: 0 20px 60px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 40px rgba(0,245,255,0.3);
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+            --font-ui: 'Rajdhani', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 22px 60px;
+            background: rgba(10,10,26,0.95); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        nav.scrolled { padding: 15px 60px; backdrop-filter: blur(40px); box-shadow: var(--shadow-light); }
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.7rem; font-weight: 800; letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta), var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            position: relative; cursor: pointer;
+        }
+        .logo::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 3px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta)); transition: width 0.4s ease;
+        }
+        .logo:hover::after { width: 100%; }
+        .nav-links { display: flex; list-style: none; gap: 35px; }
+        .nav-links a {
+            font-family: var(--font-ui);
+            color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 1rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            position: relative; transition: all 0.3s ease;
+        }
+        .nav-links a:hover, .nav-links a.active-nav { color: var(--accent-cyan); }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -8px; left: 50%; width: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+            transition: all 0.3s ease; transform: translateX(-50%);
+        }
+        .nav-links a:hover::after, .nav-links a.active-nav::after { width: 100%; }
+
+        /* Hamburger */
+        .hamburger {
+            display: none; flex-direction: column; gap: 5px; cursor: pointer;
+            background: none; border: none; padding: 5px;
+        }
+        .hamburger span {
+            display: block; width: 26px; height: 2px;
+            background: var(--accent-cyan); border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        .mobile-menu {
+            display: none; position: fixed; top: 70px; left: 0; width: 100%;
+            background: rgba(10,10,26,0.98); backdrop-filter: blur(40px);
+            border-bottom: 1px solid var(--glass-border);
+            flex-direction: column; padding: 20px 30px; gap: 20px; z-index: 999;
+        }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a {
+            font-family: var(--font-ui);
+            color: var(--text-secondary); text-decoration: none;
+            font-weight: 600; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase;
+            padding: 10px 0; border-bottom: 1px solid var(--glass-border);
+            transition: color 0.3s ease;
+        }
+        .mobile-menu a:hover { color: var(--accent-cyan); }
+
+        /* ── HERO ── */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; position: relative; padding: 0 20px;
+        }
+        .hero-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
+        }
+        .floating-grid { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        .grid-item {
+            position: absolute; background: rgba(0,245,255,0.08); border: 1px solid rgba(0,245,255,0.2);
+            border-radius: 20px; animation: floatAnim 25s infinite linear;
+        }
+        .grid-item:nth-child(1) { width: 120px; height: 80px; top: 20%; left: 10%; animation-delay: 0s; }
+        .grid-item:nth-child(2) { width: 80px; height: 120px; top: 60%; right: 15%; animation-delay: -5s; }
+        .grid-item:nth-child(3) { width: 100px; height: 100px; bottom: 20%; left: 20%; animation-delay: -10s; }
+        .grid-item:nth-child(4) { width: 60px; height: 60px; top: 40%; right: 25%; animation-delay: -15s; }
+        @keyframes floatAnim {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-30px) rotate(180deg) scale(1.1); }
+            100% { transform: translateY(0px) rotate(360deg) scale(1); }
+        }
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 9vw, 7rem); font-weight: 900; margin-bottom: 20px;
+            letter-spacing: 6px; text-transform: uppercase;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 50%, var(--accent-magenta) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 50px rgba(0,245,255,0.5));
+        }
+        @keyframes titleGlow {
+            0% { filter: drop-shadow(0 0 30px var(--accent-cyan)) brightness(1); }
+            100% { filter: drop-shadow(0 0 60px var(--accent-magenta)) brightness(1.1); }
+        }
+        .hero-subtitle {
+            font-family: var(--font-body);
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem); max-width: 700px; margin-bottom: 40px;
+            opacity: 0.85; letter-spacing: 0.5px; font-weight: 300;
+            min-height: 2em;
+        }
+        .cursor { display: inline-block; width: 2px; height: 1.2em; background: var(--accent-cyan); margin-left: 2px; vertical-align: middle; animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+        .categories { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+        .cat-btn {
+            font-family: var(--font-ui);
+            padding: 12px 26px; background: var(--glass-bg); border: 2px solid var(--glass-border);
+            border-radius: 50px; color: var(--text-primary); cursor: pointer;
+            font-weight: 600; font-size: 0.95rem; letter-spacing: 1.5px; text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); backdrop-filter: blur(20px);
+            position: relative; overflow: hidden;
+        }
+        .cat-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.6s;
+        }
+        .cat-btn:hover::before { left: 100%; }
+        .cat-btn:hover, .cat-btn.active {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta)); border-color: var(--accent-cyan);
+            transform: translateY(-4px) scale(1.05); box-shadow: var(--shadow-glow); color: #000; font-weight: 700;
+        }
+
+        /* Scroll arrow */
+        .scroll-arrow {
+            position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            animation: bounceArrow 2s ease-in-out infinite; cursor: pointer; opacity: 0.7;
+        }
+        .scroll-arrow span {
+            font-family: var(--font-ui); font-size: 0.75rem; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--accent-cyan);
+        }
+        .scroll-arrow svg { width: 28px; height: 28px; stroke: var(--accent-cyan); }
+        @keyframes bounceArrow {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ── DIVIDER ── */
+        .glow-divider {
+            width: 80%; max-width: 900px; height: 1px; margin: 0 auto;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-magenta), var(--accent-gold), transparent);
+            box-shadow: 0 0 20px rgba(0,245,255,0.5), 0 0 40px rgba(255,0,255,0.3);
+            position: relative;
+        }
+        .glow-divider::before {
+            content: '◈'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 1.2rem; color: var(--accent-cyan); background: #0a0a1a;
+            padding: 0 15px; text-shadow: 0 0 15px var(--accent-cyan);
+        }
+
+        /* ── GALLERY ── */
+        .gallery { padding: 80px 60px 100px; max-width: 1800px; margin: 0 auto; }
+        .gallery h2 {
+            font-family: var(--font-display);
+            text-align: center; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; margin-bottom: 40px;
+            letter-spacing: 4px; text-transform: uppercase;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* Search bar */
+        .search-wrapper {
+            display: flex; justify-content: center; margin-bottom: 50px;
+        }
+        .search-bar {
+            font-family: var(--font-body);
+            width: 100%; max-width: 550px; padding: 16px 24px;
+            background: var(--glass-bg); border: 2px solid var(--glass-border);
+            border-radius: 50px; color: var(--text-primary); font-size: 1rem;
+            font-weight: 400; letter-spacing: 0.5px; outline: none;
+            backdrop-filter: blur(20px); transition: all 0.3s ease;
+        }
+        .search-bar::placeholder { color: rgba(255,255,255,0.4); }
+        .search-bar:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 25px rgba(0,245,255,0.25);
+        }
+
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 45px;
+        }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--glass-bg); border-radius: 30px; backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative; overflow: hidden; padding: 30px;
+            border-top: 4px solid var(--cat-color, var(--accent-cyan));
+        }
+        .card[data-cat="cpu"]         { --cat-color: var(--accent-cyan); }
+        .card[data-cat="motherboard"] { --cat-color: var(--accent-magenta); }
+        .card[data-cat="gpu"]         { --cat-color: var(--accent-gold); }
+        .card[data-cat="storage"]     { --cat-color: var(--accent-green); }
+        .card[data-cat="power"]       { --cat-color: var(--accent-orange); }
+        .card[data-cat="peripherals"] { --cat-color: var(--accent-purple); }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: -150%; width: 150%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.7s ease; z-index: 1;
+        }
+        .card:hover::before { left: 100%; }
+        .card:hover {
+            transform: translateY(-18px) rotateX(4deg) scale(1.02);
+            background: rgba(255,255,255,0.13);
+            border-color: var(--cat-color);
+            box-shadow: var(--shadow-light), 0 0 50px rgba(0,245,255,0.3);
+        }
+
+        /* Card badges */
+        .card-badge {
+            position: absolute; top: 18px; right: 18px;
+            font-family: var(--font-ui);
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+            padding: 4px 12px; border-radius: 50px; z-index: 2;
+            background: linear-gradient(135deg, var(--cat-color), rgba(0,0,0,0.5));
+            color: #000; text-shadow: none;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+        }
+
+        /* In stock */
+        .stock-indicator {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-family: var(--font-ui); font-size: 0.8rem; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: var(--accent-green); margin-bottom: 12px;
+        }
+        .stock-dot {
+            width: 8px; height: 8px; background: var(--accent-green);
+            border-radius: 50%; animation: pulse-dot 2s ease-in-out infinite;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.7; }
+        }
+
+        /* Star rating */
+        .stars {
+            font-size: 1rem; margin-bottom: 10px; letter-spacing: 2px;
+            color: var(--accent-gold);
+        }
+        .stars .empty { color: rgba(255,215,0,0.25); }
+
+        .card-image {
+            width: 100%; height: 210px; object-fit: cover; border-radius: 18px; margin-bottom: 18px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3); transition: transform 0.4s ease;
+        }
+        .card:hover .card-image { transform: scale(1.05); }
+        .card h3 {
+            font-family: var(--font-display);
+            font-size: 1.15rem; margin-bottom: 6px; font-weight: 600;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0,245,255,0.3);
+        }
+
+        /* Price with tooltip */
+        .price-wrapper { position: relative; display: inline-block; margin-bottom: 14px; }
+        .price {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, var(--cat-color), var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700;
+            letter-spacing: 1px; cursor: help;
+        }
+        .price-tooltip {
+            display: none; position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+            background: rgba(10,10,26,0.95); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px); padding: 6px 14px; border-radius: 8px;
+            font-family: var(--font-ui); font-size: 0.85rem; font-weight: 600;
+            color: var(--accent-gold); letter-spacing: 1px; white-space: nowrap;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4); z-index: 10;
+        }
+        .price-tooltip::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: var(--glass-border);
+        }
+        .price-wrapper:hover .price-tooltip { display: block; }
+
+        .card p {
+            font-family: var(--font-body);
+            opacity: 0.8; margin-bottom: 14px; font-size: 0.95rem; font-weight: 300;
+        }
+        .card .era {
+            font-family: var(--font-ui);
+            font-size: 0.85rem; color: var(--cat-color); font-weight: 600;
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 18px;
+        }
+
+        /* View Details button */
+        .detail-btn {
+            font-family: var(--font-ui);
+            width: 100%; padding: 12px; border: 2px solid var(--cat-color);
+            border-radius: 12px; background: transparent; color: var(--cat-color);
+            font-size: 0.95rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.3s ease; position: relative; z-index: 2;
+        }
+        .detail-btn:hover {
+            background: var(--cat-color); color: #000;
+            box-shadow: 0 0 20px rgba(0,245,255,0.4);
+            transform: translateY(-2px);
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(12px); z-index: 2000; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: linear-gradient(145deg, rgba(15,15,35,0.98), rgba(26,26,58,0.98));
+            border: 1px solid var(--glass-border); border-radius: 30px;
+            border-top: 4px solid var(--modal-color, var(--accent-cyan));
+            max-width: 600px; width: 100%; padding: 40px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 60px rgba(0,245,255,0.15);
+            animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.85) translateY(30px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-close {
+            position: absolute; top: 20px; right: 25px; background: none; border: none;
+            color: var(--text-secondary); font-size: 1.8rem; cursor: pointer;
+            transition: color 0.2s; line-height: 1;
+        }
+        .modal-close:hover { color: var(--accent-magenta); }
+        .modal-img {
+            width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 24px;
+        }
+        .modal-cat-label {
+            font-family: var(--font-ui); font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--modal-color, var(--accent-cyan)); margin-bottom: 8px;
+        }
+        .modal h2 {
+            font-family: var(--font-display); font-size: 1.5rem; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;
+        }
+        .modal-stars { font-size: 1.1rem; letter-spacing: 3px; color: var(--accent-gold); margin-bottom: 16px; }
+        .modal-stars .empty { color: rgba(255,215,0,0.2); }
+        .modal-price {
+            font-family: var(--font-display); font-size: 1.8rem; font-weight: 700;
+            background: linear-gradient(135deg, var(--modal-color, var(--accent-cyan)), var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .modal-usd {
+            font-family: var(--font-ui); font-size: 1rem; color: rgba(255,215,0,0.7);
+            letter-spacing: 1px; margin-bottom: 20px;
+        }
+        .modal-divider {
+            height: 1px; background: var(--glass-border); margin: 16px 0;
+        }
+        .modal-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .spec-item {
+            background: var(--glass-bg); border-radius: 10px; padding: 10px 14px;
+            border: 1px solid var(--glass-border);
+        }
+        .spec-label {
+            font-family: var(--font-ui); font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.5);
+            margin-bottom: 2px;
+        }
+        .spec-value {
+            font-family: var(--font-body); font-size: 0.9rem; font-weight: 500;
+            color: var(--text-primary);
+        }
+        .modal-stock {
+            display: flex; align-items: center; gap: 8px;
+            font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase; color: var(--accent-green);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center; padding: 60px 60px 40px; border-top: 1px solid var(--glass-border);
+            background: rgba(10,10,26,0.8); backdrop-filter: blur(20px);
+        }
+        footer p {
+            font-family: var(--font-ui);
+            font-size: 1rem; letter-spacing: 1.5px; color: var(--text-secondary); font-weight: 500;
+        }
+
+        /* ── SCROLL TO TOP ── */
+        .scroll-top {
+            position: fixed; bottom: 35px; right: 35px; width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            border: none; border-radius: 50%; cursor: pointer; z-index: 999;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(0,245,255,0.5); opacity: 0;
+            transform: translateY(20px) scale(0.8);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+        .scroll-top.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+        .scroll-top:hover { transform: translateY(-4px) scale(1.1); }
+        .scroll-top svg { width: 20px; height: 20px; stroke: #000; stroke-width: 2.5; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            nav { padding: 18px 25px; }
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .gallery { padding: 80px 20px 80px; }
+            .grid { grid-template-columns: 1fr; gap: 35px; }
+            .categories { flex-direction: column; align-items: center; gap: 12px; }
+            .modal { padding: 28px 20px; }
+            .modal-specs { grid-template-columns: 1fr; }
+            nav.scrolled { padding: 14px 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav id="main-nav">
+        <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">Tech<span style="color: var(--accent-cyan);">Museum</span></div>
+        <ul class="nav-links">
+            <li><a href="#home" data-section="home">Home</a></li>
+            <li><a href="#gallery" data-section="gallery">Gallery</a></li>
+            <li><a href="#cpu" data-section="cpu">Processors</a></li>
+            <li><a href="#gpu" data-section="gpu">Graphics</a></li>
+            <li><a href="#storage" data-section="storage">Storage</a></li>
+            <li><a href="#peripherals" data-section="peripherals">Peripherals</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#home" class="mobile-link">Home</a>
+        <a href="#gallery" class="mobile-link">Gallery</a>
+        <a href="#cpu" class="mobile-link">Processors</a>
+        <a href="#gpu" class="mobile-link">Graphics</a>
+        <a href="#storage" class="mobile-link">Storage</a>
+        <a href="#peripherals" class="mobile-link">Peripherals</a>
+    </div>
+
+    <!-- HERO -->
+    <section id="home" class="hero">
+        <div class="hero-bg">
+            <div class="floating-grid">
+                <div class="grid-item"></div><div class="grid-item"></div>
+                <div class="grid-item"></div><div class="grid-item"></div>
+            </div>
+        </div>
+        <h1>Tech Museum</h1>
+        <p class="hero-subtitle" id="hero-subtitle"><span class="cursor"></span></p>
+        <div class="categories">
+            <button class="cat-btn active" data-cat="all">All Exhibits</button>
+            <button class="cat-btn" data-cat="cpu">CPUs</button>
+            <button class="cat-btn" data-cat="gpu">GPUs</button>
+            <button class="cat-btn" data-cat="storage">RAM/SSD</button>
+            <button class="cat-btn" data-cat="motherboard">Boards</button>
+            <button class="cat-btn" data-cat="power">Power/Case</button>
+            <button class="cat-btn" data-cat="peripherals">Peripherals</button>
+        </div>
+        <div class="scroll-arrow" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+            <span>Scroll</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </div>
+    </section>
+
+    <!-- DIVIDER -->
+    <div class="glow-divider"></div>
+
+    <!-- GALLERY -->
+    <section id="gallery" class="gallery">
+        <h2>Complete Collection (20+ Parts)</h2>
+        <div class="search-wrapper">
+            <input type="text" class="search-bar" id="search-bar" placeholder="&#128269;  Search components...">
+        </div>
+        <div class="grid" id="card-grid">
+
+            <!-- CPU -->
+            <div id="cpu" class="card" data-cat="cpu"
+                data-name="Ryzen 5 5600G" data-price="&#8369;10,000" data-usd="~$179 USD"
+                data-desc="6-core APU with integrated graphics" data-era="2026 Budget King"
+                data-stars="4" data-badge="Best Value"
+                data-img="https://images.unsplash.com/photo-1603924880540-6f30a730f117?w=500"
+                data-spec1-label="Cores / Threads" data-spec1-val="6C / 12T"
+                data-spec2-label="Base Clock" data-spec2-val="3.9 GHz"
+                data-spec3-label="Socket" data-spec3-val="AM4"
+                data-spec4-label="iGPU" data-spec4-val="Vega 7">
+                <span class="card-badge">Best Value</span>
+                <img src="https://images.unsplash.com/photo-1603924880540-6f30a730f117?w=500" alt="Ryzen CPU" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★<span class="empty">★</span></div>
+                <h3>Ryzen 5 5600G</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;10,000</div>
+                    <div class="price-tooltip">~$179 USD</div>
+                </div>
+                <p>6-core APU with integrated graphics</p>
+                <div class="era">2026 Budget King</div>
+                <button class="detail-btn" data-card="cpu-1">View Details</button>
+            </div>
+
+            <div class="card" data-cat="cpu"
+                data-name="Intel i5-12400" data-price="&#8369;11,500" data-usd="~$205 USD"
+                data-desc="6-core Alder Lake powerhouse" data-era="Hybrid Architecture"
+                data-stars="5" data-badge="Top Pick"
+                data-img="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=500"
+                data-spec1-label="Cores / Threads" data-spec1-val="6C / 12T"
+                data-spec2-label="Base Clock" data-spec2-val="2.5 GHz"
+                data-spec3-label="Socket" data-spec3-val="LGA1700"
+                data-spec4-label="Architecture" data-spec4-val="Alder Lake">
+                <span class="card-badge">Top Pick</span>
+                <img src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=500" alt="Intel CPU" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★★</div>
+                <h3>Intel i5-12400</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;11,500</div>
+                    <div class="price-tooltip">~$205 USD</div>
+                </div>
+                <p>6-core Alder Lake powerhouse</p>
+                <div class="era">Hybrid Architecture</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <!-- MOTHERBOARD -->
+            <div class="card" data-cat="motherboard"
+                data-name="Gigabyte A520M" data-price="&#8369;3,500" data-usd="~$63 USD"
+                data-desc="Micro ATX AM4 platform" data-era="Value Foundation"
+                data-stars="3" data-badge="Budget Choice"
+                data-img="https://images.unsplash.com/photo-1582378335924-431c3593d7e1?w=500"
+                data-spec1-label="Socket" data-spec1-val="AM4"
+                data-spec2-label="Form Factor" data-spec2-val="Micro-ATX"
+                data-spec3-label="Memory" data-spec3-val="DDR4 up to 64GB"
+                data-spec4-label="USB" data-spec4-val="USB 3.2 Gen1">
+                <span class="card-badge">Budget Choice</span>
+                <img src="https://images.unsplash.com/photo-1582378335924-431c3593d7e1?w=500" alt="A520 Motherboard" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★<span class="empty">★★</span></div>
+                <h3>Gigabyte A520M</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;3,500</div>
+                    <div class="price-tooltip">~$63 USD</div>
+                </div>
+                <p>Micro ATX AM4 platform</p>
+                <div class="era">Value Foundation</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <div class="card" data-cat="motherboard"
+                data-name="B550 Aorus Elite" data-price="&#8369;6,800" data-usd="~$121 USD"
+                data-desc="PCIe 4.0 gaming motherboard" data-era="Next-Gen Ready"
+                data-stars="4" data-badge="Popular"
+                data-img="https://images.unsplash.com/photo-1610872244528-0e4f52d4d24e?w=500"
+                data-spec1-label="Socket" data-spec1-val="AM4"
+                data-spec2-label="Form Factor" data-spec2-val="ATX"
+                data-spec3-label="PCIe" data-spec3-val="PCIe 4.0"
+                data-spec4-label="LAN" data-spec4-val="2.5G Intel LAN">
+                <span class="card-badge">Popular</span>
+                <img src="https://images.unsplash.com/photo-1610872244528-0e4f52d4d24e?w=500" alt="B550 Motherboard" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★<span class="empty">★</span></div>
+                <h3>B550 Aorus Elite</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;6,800</div>
+                    <div class="price-tooltip">~$121 USD</div>
+                </div>
+                <p>PCIe 4.0 gaming motherboard</p>
+                <div class="era">Next-Gen Ready</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <!-- GPU -->
+            <div id="gpu" class="card" data-cat="gpu"
+                data-name="RTX 3050 8GB" data-price="&#8369;12,000" data-usd="~$214 USD"
+                data-desc="Ray tracing for budget gamers" data-era="Entry Level RT"
+                data-stars="3" data-badge="Entry RT"
+                data-img="https://images.unsplash.com/photo-1616156568240-b3e50fa51b39?w=500"
+                data-spec1-label="CUDA Cores" data-spec1-val="2560"
+                data-spec2-label="VRAM" data-spec2-val="8GB GDDR6"
+                data-spec3-label="Output" data-spec3-val="HDMI 2.1, 3x DP"
+                data-spec4-label="PCIe" data-spec4-val="PCIe 4.0 x16">
+                <span class="card-badge">Entry RT</span>
+                <img src="https://images.unsplash.com/photo-1616156568240-b3e50fa51b39?w=500" alt="RTX 3050" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★<span class="empty">★★</span></div>
+                <h3>RTX 3050 8GB</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;12,000</div>
+                    <div class="price-tooltip">~$214 USD</div>
+                </div>
+                <p>Ray tracing for budget gamers</p>
+                <div class="era">Entry Level RT</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <div class="card" data-cat="gpu"
+                data-name="RTX 3060 Ti" data-price="&#8369;22,000" data-usd="~$393 USD"
+                data-desc="1440p gaming beast" data-era="Midrange Monster"
+                data-stars="5" data-badge="Top Pick"
+                data-img="https://images.unsplash.com/photo-1605857571498-0e20b8d7db47?w=500"
+                data-spec1-label="CUDA Cores" data-spec1-val="4864"
+                data-spec2-label="VRAM" data-spec2-val="8GB GDDR6X"
+                data-spec3-label="Target Res." data-spec3-val="1440p"
+                data-spec4-label="TDP" data-spec4-val="200W">
+                <span class="card-badge">Top Pick</span>
+                <img src="https://images.unsplash.com/photo-1605857571498-0e20b8d7db47?w=500" alt="RTX 3060" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★★</div>
+                <h3>RTX 3060 Ti</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;22,000</div>
+                    <div class="price-tooltip">~$393 USD</div>
+                </div>
+                <p>1440p gaming beast</p>
+                <div class="era">Midrange Monster</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <!-- RAM -->
+            <div id="storage" class="card" data-cat="storage"
+                data-name="Corsair Vengeance 16GB" data-price="&#8369;2,800" data-usd="~$50 USD"
+                data-desc="RGB DDR4-3200 lighting" data-era="Aesthetic Standard"
+                data-stars="4" data-badge="Best Value"
+                data-img="https://images.unsplash.com/photo-1614360004172-b82d9e607ee9?w=500"
+                data-spec1-label="Capacity" data-spec1-val="16GB (2x8)"
+                data-spec2-label="Speed" data-spec2-val="DDR4-3200"
+                data-spec3-label="Latency" data-spec3-val="CL16"
+                data-spec4-label="RGB" data-spec4-val="Yes - iCUE">
+                <span class="card-badge">Best Value</span>
+                <img src="https://images.unsplash.com/photo-1614360004172-b82d9e607ee9?w=500" alt="RGB RAM" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★<span class="empty">★</span></div>
+                <h3>Corsair Vengeance 16GB</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;2,800</div>
+                    <div class="price-tooltip">~$50 USD</div>
+                </div>
+                <p>RGB DDR4-3200 lighting</p>
+                <div class="era">Aesthetic Standard</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <div class="card" data-cat="storage"
+                data-name="Crucial 16GB DDR4" data-price="&#8369;2,000" data-usd="~$36 USD"
+                data-desc="Budget performance kit" data-era="Reliable Memory"
+                data-stars="3" data-badge="Budget Pick"
+                data-img="https://images.unsplash.com/photo-1586266390750-7dfaee8127a5?w=500"
+                data-spec1-label="Capacity" data-spec1-val="16GB (2x8)"
+                data-spec2-label="Speed" data-spec2-val="DDR4-3200"
+                data-spec3-label="Latency" data-spec3-val="CL22"
+                data-spec4-label="RGB" data-spec4-val="None">
+                <span class="card-badge">Budget Pick</span>
+                <img src="https://images.unsplash.com/photo-1586266390750-7dfaee8127a5?w=500" alt="DDR4 RAM" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★<span class="empty">★★</span></div>
+                <h3>Crucial 16GB DDR4</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;2,000</div>
+                    <div class="price-tooltip">~$36 USD</div>
+                </div>
+                <p>Budget performance kit</p>
+                <div class="era">Reliable Memory</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <!-- SSD -->
+            <div class="card" data-cat="storage"
+                data-name="Kingston NV1 1TB" data-price="&#8369;2,500" data-usd="~$45 USD"
+                data-desc="PCIe Gen3 speed demon" data-era="Fast Storage"
+                data-stars="3" data-badge="Solid Choice"
+                data-img="https://images.unsplash.com/photo-1614360004184-8b1401f3315c?w=500"
+                data-spec1-label="Capacity" data-spec1-val="1TB"
+                data-spec2-label="Interface" data-spec2-val="NVMe PCIe Gen3"
+                data-spec3-label="Read Speed" data-spec3-val="2100 MB/s"
+                data-spec4-label="Write Speed" data-spec4-val="1700 MB/s">
+                <span class="card-badge">Solid Choice</span>
+                <img src="https://images.unsplash.com/photo-1614360004184-8b1401f3315c?w=500" alt="NVMe SSD" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★<span class="empty">★★</span></div>
+                <h3>Kingston NV1 1TB</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;2,500</div>
+                    <div class="price-tooltip">~$45 USD</div>
+                </div>
+                <p>PCIe Gen3 speed demon</p>
+                <div class="era">Fast Storage</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <div class="card" data-cat="storage"
+                data-name="WD Blue SN580 500GB" data-price="&#8369;1,800" data-usd="~$32 USD"
+                data-desc="M.2 NVMe reliability" data-era="Everyday Speed"
+                data-stars="4" data-badge="Reliable"
+                data-img="https://images.unsplash.com/photo-1582378335917-5e28b1dffe47?w=500"
+                data-spec1-label="Capacity" data-spec1-val="500GB"
+                data-spec2-label="Interface" data-spec2-val="NVMe PCIe Gen4"
+                data-spec3-label="Read Speed" data-spec3-val="4150 MB/s"
+                data-spec4-label="Write Speed" data-spec4-val="4150 MB/s">
+                <span class="card-badge">Reliable</span>
+                <img src="https://images.unsplash.com/photo-1582378335917-5e28b1dffe47?w=500" alt="WD SSD" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★<span class="empty">★</span></div>
+                <h3>WD Blue SN580 500GB</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;1,800</div>
+                    <div class="price-tooltip">~$32 USD</div>
+                </div>
+                <p>M.2 NVMe reliability</p>
+                <div class="era">Everyday Speed</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <!-- POWER -->
+            <div class="card" data-cat="power"
+                data-name="Corsair VS550" data-price="&#8369;2,000" data-usd="~$36 USD"
+                data-desc="80+ Bronze certified" data-era="Stable Power"
+                data-stars="3" data-badge="Stable"
+                data-img="https://images.unsplash.com/photo-1606623080677-9f896a0721bd?w=500"
+                data-spec1-label="Wattage" data-spec1-val="550W"
+                data-spec2-label="Efficiency" data-spec2-val="80+ Bronze"
+                data-spec3-label="Modular" data-spec3-val="Non-modular"
+                data-spec4-label="Form Factor" data-spec4-val="ATX">
+                <span class="card-badge">Stable</span>
+                <img src="https://images.unsplash.com/photo-1606623080677-9f896a0721bd?w=500" alt="PSU" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★<span class="empty">★★</span></div>
+                <h3>Corsair VS550</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;2,000</div>
+                    <div class="price-tooltip">~$36 USD</div>
+                </div>
+                <p>80+ Bronze certified</p>
+                <div class="era">Stable Power</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <div class="card" data-cat="power"
+                data-name="Deepcool PL650D" data-price="&#8369;2,800" data-usd="~$50 USD"
+                data-desc="650W for demanding builds" data-era="Future Proof"
+                data-stars="4" data-badge="Future Proof"
+                data-img="https://images.unsplash.com/photo-1587829741312-4fc4e7b122db?w=500"
+                data-spec1-label="Wattage" data-spec1-val="650W"
+                data-spec2-label="Efficiency" data-spec2-val="80+ Gold"
+                data-spec3-label="Modular" data-spec3-val="Semi-modular"
+                data-spec4-label="Form Factor" data-spec4-val="ATX">
+                <span class="card-badge">Future Proof</span>
+                <img src="https://images.unsplash.com/photo-1587829741312-4fc4e7b122db?w=500" alt="Deepcool PSU" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★<span class="empty">★</span></div>
+                <h3>Deepcool PL650D</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;2,800</div>
+                    <div class="price-tooltip">~$50 USD</div>
+                </div>
+                <p>650W for demanding builds</p>
+                <div class="era">Future Proof</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <div class="card" data-cat="power"
+                data-name="NZXT H510" data-price="&#8369;4,500" data-usd="~$80 USD"
+                data-desc="Compact mid-tower design" data-era="Clean Aesthetic"
+                data-stars="5" data-badge="Top Pick"
+                data-img="https://images.unsplash.com/photo-1587829741301-dc798b83defb?w=500"
+                data-spec1-label="Type" data-spec1-val="Mid-Tower ATX"
+                data-spec2-label="Side Panel" data-spec2-val="Tempered Glass"
+                data-spec3-label="Front USB" data-spec3-val="2x USB 3.2"
+                data-spec4-label="Fan Slots" data-spec4-val="3x 120mm">
+                <span class="card-badge">Top Pick</span>
+                <img src="https://images.unsplash.com/photo-1587829741301-dc798b83defb?w=500" alt="PC Case" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★★</div>
+                <h3>NZXT H510</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;4,500</div>
+                    <div class="price-tooltip">~$80 USD</div>
+                </div>
+                <p>Compact mid-tower design</p>
+                <div class="era">Clean Aesthetic</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <div class="card" data-cat="power"
+                data-name="Noctua NH-L9" data-price="&#8369;2,200" data-usd="~$39 USD"
+                data-desc="Low-profile air cooling" data-era="Silent Performance"
+                data-stars="4" data-badge="Silent"
+                data-img="https://images.unsplash.com/photo-1581236001062-42b6c7b8f3f1?w=500"
+                data-spec1-label="Height" data-spec1-val="37mm"
+                data-spec2-label="Fan Size" data-spec2-val="92mm PWM"
+                data-spec3-label="Max TDP" data-spec3-val="65W"
+                data-spec4-label="Noise" data-spec4-val="23.6 dB(A)">
+                <span class="card-badge">Silent</span>
+                <img src="https://images.unsplash.com/photo-1581236001062-42b6c7b8f3f1?w=500" alt="CPU Cooler" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★<span class="empty">★</span></div>
+                <h3>Noctua NH-L9</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;2,200</div>
+                    <div class="price-tooltip">~$39 USD</div>
+                </div>
+                <p>Low-profile air cooling</p>
+                <div class="era">Silent Performance</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <!-- PERIPHERALS -->
+            <div id="peripherals" class="card" data-cat="peripherals"
+                data-name="Keychron K8" data-price="&#8369;4,000" data-usd="~$71 USD"
+                data-desc="Budget mechanical typing" data-era="Clicky Revival"
+                data-stars="4" data-badge="Best Value"
+                data-img="https://images.unsplash.com/photo-1612368033218-b9f1b0428ebd?w=500"
+                data-spec1-label="Layout" data-spec1-val="TKL 87-key"
+                data-spec2-label="Switches" data-spec2-val="Gateron Red/Blue/Brown"
+                data-spec3-label="Backlight" data-spec3-val="RGB"
+                data-spec4-label="Wireless" data-spec4-val="Bluetooth 5.1">
+                <span class="card-badge">Best Value</span>
+                <img src="https://images.unsplash.com/photo-1612368033218-b9f1b0428ebd?w=500" alt="Mechanical Keyboard" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★<span class="empty">★</span></div>
+                <h3>Keychron K8</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;4,000</div>
+                    <div class="price-tooltip">~$71 USD</div>
+                </div>
+                <p>Budget mechanical typing</p>
+                <div class="era">Clicky Revival</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <div class="card" data-cat="peripherals"
+                data-name="Logitech G502" data-price="&#8369;2,500" data-usd="~$45 USD"
+                data-desc="Precision gaming mouse" data-era="Ergonomic Control"
+                data-stars="5" data-badge="Top Pick"
+                data-img="https://images.unsplash.com/photo-1612368033225-9cd0b8728063?w=500"
+                data-spec1-label="Sensor" data-spec1-val="HERO 25K"
+                data-spec2-label="DPI Range" data-spec2-val="100 - 25,600"
+                data-spec3-label="Buttons" data-spec3-val="11 programmable"
+                data-spec4-label="Weight" data-spec4-val="Adjustable">
+                <span class="card-badge">Top Pick</span>
+                <img src="https://images.unsplash.com/photo-1612368033225-9cd0b8728063?w=500" alt="Gaming Mouse" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★★★</div>
+                <h3>Logitech G502</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;2,500</div>
+                    <div class="price-tooltip">~$45 USD</div>
+                </div>
+                <p>Precision gaming mouse</p>
+                <div class="era">Ergonomic Control</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+            <div class="card" data-cat="peripherals"
+                data-name="ARGB Case Fan" data-price="&#8369;800" data-usd="~$14 USD"
+                data-desc="120mm RGB airflow" data-era="Visual Cooling"
+                data-stars="3" data-badge="Budget"
+                data-img="https://images.unsplash.com/photo-1587829741364-5efac59e7235?w=500"
+                data-spec1-label="Size" data-spec1-val="120mm"
+                data-spec2-label="Speed" data-spec2-val="1200 RPM"
+                data-spec3-label="Lighting" data-spec3-val="ARGB"
+                data-spec4-label="Connector" data-spec4-val="3-pin + ARGB">
+                <span class="card-badge">Budget</span>
+                <img src="https://images.unsplash.com/photo-1587829741364-5efac59e7235?w=500" alt="RGB Fan" class="card-image">
+                <div class="stock-indicator"><div class="stock-dot"></div> In Stock</div>
+                <div class="stars">★★★<span class="empty">★★</span></div>
+                <h3>ARGB Case Fan</h3>
+                <div class="price-wrapper">
+                    <div class="price">&#8369;800</div>
+                    <div class="price-tooltip">~$14 USD</div>
+                </div>
+                <p>120mm RGB airflow</p>
+                <div class="era">Visual Cooling</div>
+                <button class="detail-btn">View Details</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>2026 Philippine Tech Museum &ndash; Complete budget PC component showcase from EasyPC/PCX archives</p>
+    </footer>
+
+    <!-- SCROLL TO TOP -->
+    <button class="scroll-top" id="scroll-top" aria-label="Scroll to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal" id="modal">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <img src="" alt="" class="modal-img" id="modal-img">
+            <div class="modal-cat-label" id="modal-cat"></div>
+            <h2 id="modal-name"></h2>
+            <div class="modal-stars" id="modal-stars"></div>
+            <div class="modal-price" id="modal-price"></div>
+            <div class="modal-usd" id="modal-usd"></div>
+            <div class="modal-divider"></div>
+            <div class="modal-specs" id="modal-specs"></div>
+            <div class="modal-divider"></div>
+            <div class="modal-stock"><div class="stock-dot"></div> In Stock &amp; Available</div>
+        </div>
+    </div>
+
+    <script>
+        /* ── SCROLL NAV ── */
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            nav.classList.toggle('scrolled', window.scrollY > 80);
+            document.getElementById('scroll-top').classList.toggle('visible', window.scrollY > 400);
+        });
+
+        /* ── SCROLL TO TOP ── */
+        document.getElementById('scroll-top').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        /* ── ACTIVE NAV on SCROLL ── */
+        const sections = [
+            { id: 'home', link: 'home' },
+            { id: 'gallery', link: 'gallery' },
+            { id: 'cpu', link: 'cpu' },
+            { id: 'gpu', link: 'gpu' },
+            { id: 'storage', link: 'storage' },
+            { id: 'peripherals', link: 'peripherals' }
+        ];
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const sectionMap = {
+            'home': 'home', 'gallery': 'gallery',
+            'cpu': 'cpu', 'gpu': 'gpu',
+            'storage': 'storage', 'peripherals': 'peripherals'
+        };
+        window.addEventListener('scroll', () => {
+            let current = 'home';
+            sections.forEach(s => {
+                const el = document.getElementById(s.id);
+                if (el && window.scrollY >= el.offsetTop - 200) current = s.link;
+            });
+            navLinks.forEach(a => {
+                a.classList.remove('active-nav');
+                if (a.dataset.section === current) a.classList.add('active-nav');
+            });
+        });
+
+        /* ── HAMBURGER ── */
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open');
+        });
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('open');
+                mobileMenu.classList.remove('open');
+            });
+        });
+
+        /* ── SMOOTH SCROLL ── */
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(anchor.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        /* ── TYPEWRITER ── */
+        const subtitle = document.getElementById('hero-subtitle');
+        const text = 'Complete showcase of 2026 affordable computing hardware – 20+ exhibits with authentic photography';
+        let i = 0;
+        function type() {
+            if (i < text.length) {
+                subtitle.innerHTML = text.slice(0, ++i) + '<span class="cursor"></span>';
+                setTimeout(type, 38);
+            } else {
+                subtitle.innerHTML = text + '<span class="cursor"></span>';
+            }
+        }
+        setTimeout(type, 600);
+
+        /* ── CATEGORY FILTER ── */
+        const catBtns = document.querySelectorAll('.cat-btn');
+        const allCards = document.querySelectorAll('.card');
+        let activeFilter = 'all';
+
+        function applyFilters() {
+            const search = document.getElementById('search-bar').value.toLowerCase();
+            allCards.forEach((card, i) => {
+                const catMatch = activeFilter === 'all' || card.dataset.cat === activeFilter;
+                const name = (card.dataset.name || '').toLowerCase();
+                const desc = (card.dataset.desc || '').toLowerCase();
+                const era  = (card.dataset.era  || '').toLowerCase();
+                const searchMatch = name.includes(search) || desc.includes(search) || era.includes(search);
+                if (catMatch && searchMatch) {
+                    setTimeout(() => {
+                        card.style.display = 'block';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0) rotateX(0deg)';
+                    }, i * 60);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => { card.style.display = 'none'; }, 300);
+                }
+            });
+        }
+
+        catBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                catBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeFilter = btn.dataset.cat;
+                applyFilters();
+            });
+        });
+
+        document.getElementById('search-bar').addEventListener('input', applyFilters);
+
+        /* ── CARD ENTER ANIMATION ── */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, idx) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0) rotateX(0deg)';
+                    }, idx * 100);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+        allCards.forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(60px) rotateX(-15deg)';
+            card.style.transition = 'all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            observer.observe(card);
+        });
+
+        /* ── MODAL ── */
+        const overlay = document.getElementById('modal-overlay');
+        const modal   = document.getElementById('modal');
+        const catColorMap = {
+            cpu: '#00f5ff', motherboard: '#ff00ff',
+            gpu: '#ffd700', storage: '#00ff88',
+            power: '#ff6600', peripherals: '#aa44ff'
+        };
+        const catLabelMap = {
+            cpu: 'Processor', motherboard: 'Motherboard',
+            gpu: 'Graphics Card', storage: 'Memory / Storage',
+            power: 'Power & Cooling', peripherals: 'Peripherals'
+        };
+
+        function starsHtml(n) {
+            return '★'.repeat(n) + '<span class="empty">' + '★'.repeat(5 - n) + '</span>';
+        }
+
+        document.querySelectorAll('.detail-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const card = btn.closest('.card');
+                const cat = card.dataset.cat;
+                const color = catColorMap[cat] || '#00f5ff';
+
+                modal.style.setProperty('--modal-color', color);
+                document.getElementById('modal-img').src = card.dataset.img;
+                document.getElementById('modal-img').alt = card.dataset.name;
+                document.getElementById('modal-cat').textContent = catLabelMap[cat] || cat;
+                document.getElementById('modal-cat').style.color = color;
+                document.getElementById('modal-name').textContent = card.dataset.name;
+                document.getElementById('modal-stars').innerHTML = starsHtml(parseInt(card.dataset.stars));
+                document.getElementById('modal-price').innerHTML = card.dataset.price;
+                document.getElementById('modal-usd').textContent = card.dataset.usd;
+
+                const specs = document.getElementById('modal-specs');
+                specs.innerHTML = '';
+                for (let s = 1; s <= 4; s++) {
+                    const lbl = card.dataset[`spec${s}Label`];
+                    const val = card.dataset[`spec${s}Val`];
+                    if (lbl && val) {
+                        specs.innerHTML += `<div class="spec-item"><div class="spec-label">${lbl}</div><div class="spec-value">${val}</div></div>`;
+                    }
+                }
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        function closeModal() {
+            overlay.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        /* ── PARTICLES ── */
+        function createParticle(x, y, size = 3) {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: fixed; width: ${size}px; height: ${size}px;
+                background: radial-gradient(circle, ${Math.random() > 0.5 ? '#00f5ff' : '#ff00ff'} 0%, transparent 70%);
+                border-radius: 50%; left: ${x}px; top: ${y}px; pointer-events: none; z-index: 10;
+                animation: particleRise 4s linear forwards;
+            `;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 4000);
+        }
+
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                @keyframes particleRise {
+                    0% { transform: translateY(0) scale(1); opacity: 1; }
+                    100% { transform: translateY(-200vh) scale(0); opacity: 0; }
+                }
+            </style>
+        `);
+
+        document.addEventListener('mousemove', e => {
+            if (Math.random() < 0.07) createParticle(e.clientX, e.clientY, Math.random() * 4 + 2);
+        });
+        setInterval(() => createParticle(Math.random() * window.innerWidth, window.innerHeight), 800);
+    </script>
+</body>
+</html>

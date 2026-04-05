@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Museum - Complete Hardware Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0f0f23 100%);
+            --glass-bg: rgba(255,255,255,0.08);
+            --glass-border: rgba(255,255,255,0.15);
+            --accent-cyan: #00f5ff;
+            --accent-magenta: #ff00ff;
+            --accent-gold: #ffd700;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.8);
+            --shadow-light: 0 20px 60px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 40px rgba(0,245,255,0.3);
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+            --font-ui: 'Rajdhani', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 25px 60px;
+            background: rgba(10,10,26,0.95); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        nav.scrolled { padding: 18px 60px; backdrop-filter: blur(40px); box-shadow: var(--shadow-light); }
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.7rem; font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta), var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            position: relative;
+        }
+        .logo::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 3px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta)); transition: width 0.4s ease;
+        }
+        .logo:hover::after { width: 100%; }
+        .nav-links { display: flex; list-style: none; gap: 40px; }
+        .nav-links a {
+            font-family: var(--font-ui);
+            color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 1.1rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            position: relative; transition: all 0.3s ease;
+        }
+        .nav-links a:hover { color: var(--accent-cyan); transform: translateY(-2px); }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -8px; left: 50%; width: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+            transition: all 0.3s ease; transform: translateX(-50%);
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .hero {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; position: relative; padding: 0 20px;
+        }
+        .hero-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
+        }
+        .floating-grid { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        .grid-item {
+            position: absolute; background: rgba(0,245,255,0.08); border: 1px solid rgba(0,245,255,0.2);
+            border-radius: 20px; animation: float 25s infinite linear;
+        }
+        .grid-item:nth-child(1) { width: 120px; height: 80px; top: 20%; left: 10%; animation-delay: 0s; }
+        .grid-item:nth-child(2) { width: 80px; height: 120px; top: 60%; right: 15%; animation-delay: -5s; }
+        .grid-item:nth-child(3) { width: 100px; height: 100px; bottom: 20%; left: 20%; animation-delay: -10s; }
+        .grid-item:nth-child(4) { width: 60px; height: 60px; top: 40%; right: 25%; animation-delay: -15s; }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-30px) rotate(180deg) scale(1.1); }
+            100% { transform: translateY(0px) rotate(360deg) scale(1); }
+        }
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 9vw, 7rem); font-weight: 900; margin-bottom: 25px;
+            letter-spacing: 6px; text-transform: uppercase;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 50%, var(--accent-magenta) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 50px rgba(0,245,255,0.5));
+        }
+        @keyframes titleGlow {
+            0% { filter: drop-shadow(0 0 30px var(--accent-cyan)) brightness(1); }
+            100% { filter: drop-shadow(0 0 60px var(--accent-magenta)) brightness(1.1); }
+        }
+        .hero p {
+            font-family: var(--font-body);
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem); max-width: 700px; margin-bottom: 40px;
+            opacity: 0.85; letter-spacing: 0.5px; font-weight: 300;
+        }
+        .categories { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .cat-btn {
+            font-family: var(--font-ui);
+            padding: 14px 30px; background: var(--glass-bg); border: 2px solid var(--glass-border);
+            border-radius: 50px; color: var(--text-primary); cursor: pointer;
+            font-weight: 600; font-size: 1rem; letter-spacing: 1.5px; text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); backdrop-filter: blur(20px);
+            position: relative; overflow: hidden;
+        }
+        .cat-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.6s;
+        }
+        .cat-btn:hover::before { left: 100%; }
+        .cat-btn:hover, .cat-btn.active {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta)); border-color: var(--accent-cyan);
+            transform: translateY(-5px) scale(1.05); box-shadow: var(--shadow-glow); color: #000; font-weight: 700;
+        }
+        .gallery { padding: 120px 60px 100px; max-width: 1800px; margin: 0 auto; }
+        .gallery h2 {
+            font-family: var(--font-display);
+            text-align: center; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; margin-bottom: 80px;
+            letter-spacing: 4px; text-transform: uppercase;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 50px;
+        }
+        .card {
+            background: var(--glass-bg); border-radius: 30px; backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative; overflow: hidden; padding: 30px;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: -150%; width: 150%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.7s ease; z-index: 1;
+        }
+        .card:hover::before { left: 100%; }
+        .card:hover {
+            transform: translateY(-20px) rotateX(5deg) scale(1.03); background: rgba(255,255,255,0.15);
+            border-color: var(--accent-cyan); box-shadow: var(--shadow-light), 0 0 60px rgba(0,245,255,0.4);
+        }
+        .card-image {
+            width: 100%; height: 220px; object-fit: cover; border-radius: 20px; margin-bottom: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3); transition: transform 0.4s ease;
+        }
+        .card:hover .card-image { transform: scale(1.05); }
+        .card h3 {
+            font-family: var(--font-display);
+            font-size: 1.3rem; margin-bottom: 10px; font-weight: 600;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0,245,255,0.3);
+        }
+        .card .price {
+            font-family: var(--font-display);
+            font-size: 1.5rem; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        .card p {
+            font-family: var(--font-body);
+            opacity: 0.85; margin-bottom: 20px; font-size: 1rem; font-weight: 300;
+        }
+        .card .era {
+            font-family: var(--font-ui);
+            font-size: 0.9rem; color: var(--accent-cyan); font-weight: 600;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        footer {
+            text-align: center; padding: 60px 60px 40px; border-top: 1px solid var(--glass-border);
+            background: rgba(10,10,26,0.8); backdrop-filter: blur(20px);
+        }
+        footer p {
+            font-family: var(--font-ui);
+            font-size: 1rem; letter-spacing: 1.5px; color: var(--text-secondary); font-weight: 500;
+        }
+        @media (max-width: 768px) {
+            nav { padding: 20px 30px; } .nav-links { display: none; }
+            .gallery { padding: 100px 30px 80px; } .grid { grid-template-columns: 1fr; gap: 40px; }
+            .categories { flex-direction: column; align-items: center; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Tech<span style="color: var(--accent-cyan);">Museum</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#cpu">Processors</a></li>
+            <li><a href="#gpu">Graphics</a></li>
+            <li><a href="#storage">Storage</a></li>
+            <li><a href="#peripherals">Peripherals</a></li>
+        </ul>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-bg">
+            <div class="floating-grid">
+                <div class="grid-item"></div><div class="grid-item"></div>
+                <div class="grid-item"></div><div class="grid-item"></div>
+            </div>
+        </div>
+
+        <h1>Tech Museum</h1>
+        <p>Complete showcase of 2026 affordable computing hardware – 20+ exhibits with authentic photography</p>
+        <div class="categories">
+            <button class="cat-btn active" data-cat="all">All Exhibits</button>
+            <button class="cat-btn" data-cat="cpu">CPUs</button>
+            <button class="cat-btn" data-cat="gpu">GPUs</button>
+            <button class="cat-btn" data-cat="storage">RAM/SSD</button>
+            <button class="cat-btn" data-cat="motherboard">Boards</button>
+            <button class="cat-btn" data-cat="power">Power/Case</button>
+            <button class="cat-btn" data-cat="peripherals">Peripherals</button>
+        </div>
+    </section>
+
+    <section id="gallery" class="gallery">
+        <h2>Complete Collection (20+ Parts)</h2>
+        <div class="grid">
+            <!-- CPU Section -->
+            <div class="card" data-cat="cpu">
+                <img src="https://images.unsplash.com/photo-1603924880540-6f30a730f117?w=500" alt="Ryzen CPU" class="card-image">
+                <h3>Ryzen 5 5600G</h3>
+                <div class="price">&#8369;10,000</div>
+                <p>6-core APU with integrated graphics</p>
+                <div class="era">2026 Budget King</div>
+            </div>
+
+            <div class="card" data-cat="cpu">
+                <img src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=500" alt="Intel CPU" class="card-image">
+                <h3>Intel i5-12400</h3>
+                <div class="price">&#8369;11,500</div>
+                <p>6-core Alder Lake powerhouse</p>
+                <div class="era">Hybrid Architecture</div>
+            </div>
+
+            <!-- Motherboard Section -->
+            <div class="card" data-cat="motherboard">
+                <img src="https://images.unsplash.com/photo-1582378335924-431c3593d7e1?w=500" alt="A520 Motherboard" class="card-image">
+                <h3>Gigabyte A520M</h3>
+                <div class="price">&#8369;3,500</div>
+                <p>Micro ATX AM4 platform</p>
+                <div class="era">Value Foundation</div>
+            </div>
+
+            <div class="card" data-cat="motherboard">
+                <img src="https://images.unsplash.com/photo-1610872244528-0e4f52d4d24e?w=500" alt="B550 Motherboard" class="card-image">
+                <h3>B550 Aorus Elite</h3>
+                <div class="price">&#8369;6,800</div>
+                <p>PCIe 4.0 gaming motherboard</p>
+                <div class="era">Next-Gen Ready</div>
+            </div>
+
+            <!-- GPU Section -->
+            <div class="card" data-cat="gpu">
+                <img src="https://images.unsplash.com/photo-1616156568240-b3e50fa51b39?w=500" alt="RTX 3050" class="card-image">
+                <h3>RTX 3050 8GB</h3>
+                <div class="price">&#8369;12,000</div>
+                <p>Ray tracing for budget gamers</p>
+                <div class="era">Entry Level RT</div>
+            </div>
+
+            <div class="card" data-cat="gpu">
+                <img src="https://images.unsplash.com/photo-1605857571498-0e20b8d7db47?w=500" alt="RTX 3060" class="card-image">
+                <h3>RTX 3060 Ti</h3>
+                <div class="price">&#8369;22,000</div>
+                <p>1440p gaming beast</p>
+                <div class="era">Midrange Monster</div>
+            </div>
+
+            <!-- RAM Section -->
+            <div class="card" data-cat="storage">
+                <img src="https://images.unsplash.com/photo-1614360004172-b82d9e607ee9?w=500" alt="RGB RAM" class="card-image">
+                <h3>Corsair Vengeance 16GB</h3>
+                <div class="price">&#8369;2,800</div>
+                <p>RGB DDR4-3200 lighting</p>
+                <div class="era">Aesthetic Standard</div>
+            </div>
+
+            <div class="card" data-cat="storage">
+                <img src="https://images.unsplash.com/photo-1586266390750-7dfaee8127a5?w=500" alt="DDR4 RAM" class="card-image">
+                <h3>Crucial 16GB DDR4</h3>
+                <div class="price">&#8369;2,000</div>
+                <p>Budget performance kit</p>
+                <div class="era">Reliable Memory</div>
+            </div>
+
+            <!-- Storage Section -->
+            <div class="card" data-cat="storage">
+                <img src="https://images.unsplash.com/photo-1614360004184-8b1401f3315c?w=500" alt="NVMe SSD" class="card-image">
+                <h3>Kingston NV1 1TB</h3>
+                <div class="price">&#8369;2,500</div>
+                <p>PCIe Gen3 speed demon</p>
+                <div class="era">Fast Storage</div>
+            </div>
+
+            <div class="card" data-cat="storage">
+                <img src="https://images.unsplash.com/photo-1582378335917-5e28b1dffe47?w=500" alt="WD SSD" class="card-image">
+                <h3>WD Blue SN580 500GB</h3>
+                <div class="price">&#8369;1,800</div>
+                <p>M.2 NVMe reliability</p>
+                <div class="era">Everyday Speed</div>
+            </div>
+
+            <!-- Power Supply -->
+            <div class="card" data-cat="power">
+                <img src="https://images.unsplash.com/photo-1606623080677-9f896a0721bd?w=500" alt="PSU" class="card-image">
+                <h3>Corsair VS550</h3>
+                <div class="price">&#8369;2,000</div>
+                <p>80+ Bronze certified</p>
+                <div class="era">Stable Power</div>
+            </div>
+
+            <div class="card" data-cat="power">
+                <img src="https://images.unsplash.com/photo-1587829741312-4fc4e7b122db?w=500" alt="Deepcool PSU" class="card-image">
+                <h3>Deepcool PL650D</h3>
+                <div class="price">&#8369;2,800</div>
+                <p>650W for demanding builds</p>
+                <div class="era">Future Proof</div>
+            </div>
+
+            <!-- Cases -->
+            <div class="card" data-cat="power">
+                <img src="https://images.unsplash.com/photo-1587829741301-dc798b83defb?w=500" alt="PC Case" class="card-image">
+                <h3>NZXT H510</h3>
+                <div class="price">&#8369;4,500</div>
+                <p>Compact mid-tower design</p>
+                <div class="era">Clean Aesthetic</div>
+            </div>
+
+            <!-- Cooling -->
+            <div class="card" data-cat="power">
+                <img src="https://images.unsplash.com/photo-1581236001062-42b6c7b8f3f1?w=500" alt="CPU Cooler" class="card-image">
+                <h3>Noctua NH-L9</h3>
+                <div class="price">&#8369;2,200</div>
+                <p>Low-profile air cooling</p>
+                <div class="era">Silent Performance</div>
+            </div>
+
+            <!-- Peripherals -->
+            <div class="card" data-cat="peripherals">
+                <img src="https://images.unsplash.com/photo-1612368033218-b9f1b0428ebd?w=500" alt="Mechanical Keyboard" class="card-image">
+                <h3>Keychron K8</h3>
+                <div class="price">&#8369;4,000</div>
+                <p>Budget mechanical typing</p>
+                <div class="era">Clicky Revival</div>
+            </div>
+
+            <div class="card" data-cat="peripherals">
+                <img src="https://images.unsplash.com/photo-1612368033225-9cd0b8728063?w=500" alt="Gaming Mouse" class="card-image">
+                <h3>Logitech G502</h3>
+                <div class="price">&#8369;2,500</div>
+                <p>Precision gaming mouse</p>
+                <div class="era">Ergonomic Control</div>
+            </div>
+
+            <div class="card" data-cat="peripherals">
+                <img src="https://images.unsplash.com/photo-1587829741364-5efac59e7235?w=500" alt="RGB Fan" class="card-image">
+                <h3>ARGB Case Fan</h3>
+                <div class="price">&#8369;800</div>
+                <p>120mm RGB airflow</p>
+                <div class="era">Visual Cooling</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>2026 Philippine Tech Museum &ndash; Complete budget PC component showcase from EasyPC/PCX archives</p>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 100);
+        });
+
+        const catBtns = document.querySelectorAll('.cat-btn');
+        const cards = document.querySelectorAll('.card');
+        catBtns.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                catBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.dataset.cat;
+                cards.forEach((card, i) => {
+                    if (filter === 'all' || card.dataset.cat === filter) {
+                        setTimeout(() => {
+                            card.style.display = 'block';
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0) rotateX(0deg)';
+                        }, i * 120);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(30px) rotateX(-10deg)';
+                        setTimeout(() => { card.style.display = 'none'; }, 400);
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelector(anchor.getAttribute('href')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0) rotateX(0deg)';
+                    }, index * 150);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+        cards.forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(60px) rotateX(-15deg)';
+            card.style.transition = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            observer.observe(card);
+        });
+
+        function createParticle(x, y, size = 3) {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: fixed; width: ${size}px; height: ${size}px;
+                background: radial-gradient(circle, ${Math.random() > 0.5 ? 'var(--accent-cyan)' : 'var(--accent-magenta'} 0%, transparent 70%);
+                border-radius: 50%; left: ${x}px; top: ${y}px; pointer-events: none; z-index: 10;
+                animation: particleRise 4s linear forwards;
+            `;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 4000);
+        }
+
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                @keyframes particleRise {
+                    0% { transform: translateY(0) scale(1); opacity: 1; }
+                    100% { transform: translateY(-200vh) scale(0); opacity: 0; }
+                }
+            </style>
+        `);
+
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() < 0.08) createParticle(e.clientX, e.clientY, Math.random() * 4 + 2);
+        });
+        setInterval(() => createParticle(Math.random() * window.innerWidth, window.innerHeight), 700);
+    </script>
+</body>
+</html>
